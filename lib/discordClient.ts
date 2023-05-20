@@ -30,7 +30,8 @@ class DiscordClient extends Client {
   }
 
   isLoggedIn() {
-    return this.ws.status === 0;
+    console.log(this.isReady())
+    return this.isReady();
   }
 
   isLoggedOut() {

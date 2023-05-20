@@ -42,8 +42,6 @@ const executeCommand = async (
       messages.push({ role: "user", content: text });
     }
 
-    console.log(messages)
-
     let completion;
     let attempts = 0;
 
