@@ -38,7 +38,11 @@ const executeCommand = async (
 
     if (messages[messages.length - 1].role === "user") {
       messages[messages.length - 1] = { role: "user", content: text };
+    } else {
+      messages.push({ role: "user", content: text });
     }
+
+    console.log(messages)
 
     let completion;
     let attempts = 0;
