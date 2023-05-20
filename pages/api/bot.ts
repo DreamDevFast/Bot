@@ -1,7 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { Client, GatewayIntentBits } from "discord.js";
 import createOpenAI, { AIChatMessage } from "@/openai/config";
-import { isBot } from "next/dist/server/web/spec-extension/user-agent";
 
 const client = new Client({
   intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent],
@@ -42,37 +41,46 @@ client.on("messageCreate", async (message) => {
         }
       });
     }
-    console.log('messages = ', messages)
+    
+    if (messages[messages.length - 1].role === 'user') {
+      messages[messages.length - 1] = {role: 'user', content: text}
+    }
 
-    try {
-      const prompt: AIChatMessage[] = [
-        { role: "user", content: `Please answer this question: ${text}` },
-      ];
+    let completion
+    let attempts = 0
 
-      const completion = await openAI.createChatCompletion({
-        model: "gpt-4",
-        messages: messages,
-        max_tokens: 1500,
-        temperature: 0.0,
-        top_p: 1.0,
-        frequency_penalty: 0.0,
-        presence_penalty: 0.0,
-      });
-
-      const answer = (completion.data.choices[0].message?.content ?? "").trim();
-
-      if (isMentioned) {
-        const thread = await message.startThread({
-          name: "ChatGPT Thread with " + message.author.username,
-          autoArchiveDuration: 60,
+    while(!completion) {
+      try {
+        completion = await openAI.createChatCompletion({
+          model: "gpt-4",
+          messages: messages,
+          max_tokens: 1500,
+          temperature: 0.0,
+          top_p: 1.0,
+          frequency_penalty: 0.0,
+          presence_penalty: 0.0,
         });
-        thread.send(answer);
-      } else {
-        message.channel.send(answer);
+  
+        const answer = (completion.data.choices[0].message?.content ?? "").trim();
+  
+        if (isMentioned) {
+          const thread = await message.startThread({
+            name: "ChatGPT Thread with " + message.author.username,
+            autoArchiveDuration: 60,
+          });
+          thread.send(answer);
+        } else {
+          message.channel.send(answer);
+        }
+      } catch (error) {
+        console.error(error);
+        attempts += 1
+        if (attempts > 6) {
+          message.reply("Sorry, I could not process your request.");
+        } else {
+          await sleep(500)
+        }
       }
-    } catch (error) {
-      console.error(error);
-      message.reply("Sorry, I could not process your request.");
     }
   }
 });
