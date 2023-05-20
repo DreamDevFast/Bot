@@ -4,7 +4,7 @@ import createOpenAI, { AIChatMessage } from "@/openai/config";
 import { isBot } from "next/dist/server/web/spec-extension/user-agent";
 
 const client = new Client({
-  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages],
+  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent],
 });
 const openAI = createOpenAI();
 
@@ -28,12 +28,13 @@ client.on("messageCreate", async (message) => {
     const text = isMentioned ? message.content.replace(`<@${client.user?.id}>`, '').trim() : message.content;
 
     const messages: AIChatMessage[] = [
-      { role: 'user', content: text },
+      { role: 'system', content: 'You are ChatGPT, a large language model trained by OpenAI. Follow the user\'s instructions carefully. Respond using plain text.' },
     ];
 
     if (isBotThread) {
-      const fetchedMessages = await message.channel.messages.fetch({ limit: 10 });
-      fetchedMessages.forEach(fetchedMessage => {
+      const fetchedMessages = await message.channel.messages.fetch({});
+      const reversedMessages = fetchedMessages.reverse()
+      reversedMessages.forEach(fetchedMessage => {
         if (fetchedMessage.author.bot) {
           messages.push({ role: 'assistant', content: fetchedMessage.content });
         } else {
@@ -41,6 +42,7 @@ client.on("messageCreate", async (message) => {
         }
       });
     }
+    console.log('messages = ', messages)
 
     try {
       const prompt: AIChatMessage[] = [
@@ -58,8 +60,6 @@ client.on("messageCreate", async (message) => {
       });
 
       const answer = (completion.data.choices[0].message?.content ?? "").trim();
-
-      console.log("answer = ", answer);
 
       if (isMentioned) {
         const thread = await message.startThread({
