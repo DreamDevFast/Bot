@@ -23,13 +23,17 @@ class DiscordClient extends Client {
     });
   }
 
+  async logout() {
+    if (!this.isLoggedOut()) {
+      this.destroy()
+    }
+  }
+
   isLoggedIn() {
-    console.log('status = ', this.ws.status, this)
     return this.ws.status === 0;
   }
 
   isLoggedOut() {
-    console.log('status = ', this.ws.status, this)
     return this.ws.status === 5;
   }
 }
