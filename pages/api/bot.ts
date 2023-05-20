@@ -63,7 +63,7 @@ client.on("messageCreate", async (message) => {
   
         const answer = (completion.data.choices[0].message?.content ?? "").trim();
   
-        if (isMentioned) {
+        if (isMentioned && !isBotThread) {
           const thread = await message.startThread({
             name: "ChatGPT Thread with " + message.author.username,
             autoArchiveDuration: 60,
