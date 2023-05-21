@@ -19,8 +19,6 @@ class DiscordClient extends Client {
           ? message.content.replace(`<@${this.user?.id}>`, "").trim()
           : message.content;
       
-      console.log('message = ', text)
-
       await executeCommand(message, text, isMentioned, isBotThread)
     });
   }
