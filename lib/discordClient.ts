@@ -18,6 +18,8 @@ class DiscordClient extends Client {
       const text = isMentioned
           ? message.content.replace(`<@${this.user?.id}>`, "").trim()
           : message.content;
+      
+      console.log('message = ', text)
 
       await executeCommand(message, text, isMentioned, isBotThread)
     });
