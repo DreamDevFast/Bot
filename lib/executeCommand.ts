@@ -65,7 +65,7 @@ const executeCommand = async (
   isMentioned: boolean,
   isBotThread: boolean
 ) => {
-  if (isMentioned || isBotThread) {
+  if (isMentioned) {
     message.channel.sendTyping();
 
     const messages: AIChatMessage[] = [
