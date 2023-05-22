@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { discordClient } from "@/lib/discordClient";
+import { discordClient } from "@/lib/discord/discordClient";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   console.log("starting bot...");

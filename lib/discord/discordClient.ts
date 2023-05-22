@@ -1,5 +1,5 @@
 import { Client, ClientOptions, GatewayIntentBits } from "discord.js";
-import executeCommand from "./executeCommand";
+import executeCommand from "@/lib/chat/executeCommand";
 
 class DiscordClient extends Client {
   constructor(options: ClientOptions) {
